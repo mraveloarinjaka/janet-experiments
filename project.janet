@@ -6,4 +6,4 @@
 
 (declare-executable
   :name "space.mrave.app.janet-experiments"
-  :entry "src/core/main.janet")
+  :entry "src/main.janet")
