@@ -1,4 +1,4 @@
-(import set)
+(import space.mrave.lib.set :as set)
 (import ./lib/math :as my-math)
 
 (my-math/sum 40 2)
