@@ -1,3 +1,6 @@
 jpm_tree/
 thirdparties/
 build/
+/.clj-kondo/
+/.lsp/
+/.nrepl-port
