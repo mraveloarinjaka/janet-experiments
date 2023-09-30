@@ -49,16 +49,26 @@
                        :let [entries (drop i parsed-input)]]
                    (let [$x (gensym)]
                      ~[,$x :in [,;entries]]))]
-    (with-syms [$result]
+    (with-syms [$entries $result]
       ~(seq ,(-> (array/concat @[] ~,;bindings)
                  (array/push :when ~(= ,TARGET_SUM (+ ,;(map first bindings))))
-                 (array/push :let ~[,$result (* ,;(map first bindings))]))
-         ,$result))))
+                 (array/push :let ~[,$entries ,(map first bindings)
+                                    ,$result (apply * ,$entries)]))
+         [,$entries ,$result]))))
 
 (def PARSED-INPUT (->> (string/split "\n" sample)
                        (map parse)))
 
 (macex1 ~(find-n-entries-ex ,PARSED-INPUT 3))
+
+# @[1721 979 366 299 675 1456]
+
+#(seq @[_00008G :in [1721 979 366 299 675 1456]
+#       _00008H :in [979 366 299 675 1456]
+#       _00008I :in [366 299 675 1456]
+#       :when (= 2020 (+ _00008G _00008H _00008I))
+#       :let [_00008J (* _00008G _00008H _00008I)]] _00008J)
+
 (eval ~(find-n-entries-ex ,PARSED-INPUT 3))
 
 (def PARSED-RESOURCE (->> (slurp "resources/aoc2020/day1.txt")
