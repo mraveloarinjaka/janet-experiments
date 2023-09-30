@@ -26,16 +26,35 @@
          (<= freq upper-bound))))
 
 (defn nb-valid-passwords
-  [passwords]
-  (->> passwords
-       (string/split "\n")
-       (filter (complement empty?))
-       (map (fn [rule] (peg/match RULE-GRAMMAR rule)))
-       (filter password-valid?)
-       length))
+  [passwords &named password-policy-checker]
+  (let [checker (if password-policy-checker password-policy-checker password-valid?)]
+    (->> passwords
+         (string/split "\n")
+         (filter (complement empty?))
+         (map (fn [rule] (peg/match RULE-GRAMMAR rule)))
+         (filter checker)
+         length)))
 
 (nb-valid-passwords SAMPLE)
 (nb-valid-passwords (slurp "resources/aoc2020/day2.txt"))
+
+(defn new-rule-password-valid?
+  [[first-pos second-pos mandatory-character password]]
+  #(printf "first-pos: %d - second-pos: %d - mandatory-character: %s - password: %s" first-pos second-pos mandatory-character password)
+  (let [madatory-character-as-byte (first (string/bytes mandatory-character))
+        first-char (get password (dec first-pos))
+        first-char-valid? (= first-char madatory-character-as-byte)
+        second-char (get password (dec second-pos))
+        second-char-valid? (= second-char madatory-character-as-byte)]
+    (when (not (or (nil? first-char)
+                   (nil? second-char)))
+      #(printf "mandatory-character: %d - first-char: %d - second-char %d" madatory-character-as-byte first-char second-char)
+      (or (and first-char-valid? (not second-char-valid?))
+          (and (not first-char-valid?) second-char-valid?)))))
+
+(nb-valid-passwords SAMPLE :password-policy-checker new-rule-password-valid?)
+
+(nb-valid-passwords (slurp "resources/aoc2020/day2.txt") :password-policy-checker new-rule-password-valid?)
 
 (comment
 
